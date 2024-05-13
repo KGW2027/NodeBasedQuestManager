@@ -1,5 +1,6 @@
 ﻿#include "Control/QuestAssetEditor.h"
 
+#include "Control/EditorEventListener.h"
 #include "View/Frame/QuestInnerFrame.h"
 #include "View/Frame/QuestListFrame.h"
 #include "View/Frame/QuestNodeFrame.h"
@@ -7,7 +8,8 @@
 
 
 #define LOCTEXT_NAMESPACE "NodeBasedQuestModule"
-
+TSharedPtr<EditorEventListener> FQuestAssetEditor::Listener = MakeShared<EditorEventListener>();
+float FQuestAssetEditor::ZoomMultiplier = 1.0;
 FName QuestAssetEditorIdentifier("NodeBasedQuestEditor");
 
 #pragma region Default Override Functions
@@ -29,7 +31,7 @@ FLinearColor FQuestAssetEditor::GetWorldCentricTabColorScale() const
 }
 #pragma endregion 
 
-
+#pragma region Asset Editor Functions
 void FQuestAssetEditor::InitAssetEditorExternal(const TArray<UObject*>& Args)
 {
 	FName LayoutKey = FName(QuestAssetEditorIdentifier.ToString() + "_Layout");
@@ -83,6 +85,8 @@ void FQuestAssetEditor::InitAssetEditorExternal(const TArray<UObject*>& Args)
 	);
 	InitAssetEditor(EToolkitMode::Standalone, {}, QuestAssetEditorIdentifier, Layout, false, true, Args);
 	FUnrealEdMisc::Get().AllowSavingLayoutOnClose(true);
+
+	Listener->OnZoomMultiplierChanged.AddStatic(&FQuestAssetEditor::OnChangedZoomMultiplier);
 }
 
 void FQuestAssetEditor::RegisterTabSpawners(const TSharedRef<FTabManager>& _TabManager)
@@ -107,7 +111,6 @@ void FQuestAssetEditor::RegisterTabSpawners(const TSharedRef<FTabManager>& _TabM
 	.SetGroup(WorkspaceMenuCategory.ToSharedRef());
 
 }
-
 void FQuestAssetEditor::UnregisterTabSpawners(const TSharedRef<FTabManager>& _TabManager)
 {
 	FAssetEditorToolkit::UnregisterTabSpawners(_TabManager);
@@ -117,5 +120,14 @@ void FQuestAssetEditor::UnregisterTabSpawners(const TSharedRef<FTabManager>& _Ta
 	_TabManager->UnregisterTabSpawner(QuestNodeFrame::GetTabName());
 	_TabManager->UnregisterTabSpawner(QuestPropertyFrame::GetTabName());
 }
+#pragma endregion
+
+#pragma region EventListener
+void FQuestAssetEditor::OnChangedZoomMultiplier(float Delta)
+{
+	ZoomMultiplier = FMath::Clamp(ZoomMultiplier + Delta / 10, 0.5, 2.0);
+}
+
+#pragma endregion
 
 #undef LOCTEXT_NAMESPACE

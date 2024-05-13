@@ -1,10 +1,15 @@
 ﻿#include "View/Frame/QuestNodeFrame.h"
 
+#include "View/Panel/QuestNodeGraphPanel.h"
+
 #define LOCTEXT_NAMESPACE "NodeBasedQuestModule"
 
 TSharedRef<SDockTab> QuestNodeFrame::CreateTab(const FSpawnTabArgs& SpawnTabArgs)
 {
-	return SNew(SDockTab).TabRole(PanelTab)[SNew(STextBlock).Text(FText::FromString("Hello, Nodes?"))];
+	return SNew(SDockTab).TabRole(PanelTab)
+		[
+			SNew(SQuestNodeGraphPanel)
+		];
 }
 
 FName QuestNodeFrame::GetTabName()
