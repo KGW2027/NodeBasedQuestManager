@@ -5,6 +5,7 @@ UCLASS()
 class NODEBASEDQUESTMANAGER_API UQuestInfo : public UObject
 {
 	GENERATED_BODY()
+	
 public:
 	UPROPERTY()
 	FName UniqueId;
@@ -14,5 +15,4 @@ public:
 
 	UPROPERTY()
 	FVector2D Position;
-	
 };

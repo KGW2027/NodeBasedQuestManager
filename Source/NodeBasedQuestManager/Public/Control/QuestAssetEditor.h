@@ -1,11 +1,12 @@
 ﻿#pragma once
+#include "Model/QuestAssetInfo.h"
 
-class EditorEventListener;
+class FEditorEventListener;
 
 class FQuestAssetEditor : public FAssetEditorToolkit
 {
 public:
-	static TSharedPtr<EditorEventListener> Listener;
+	static TSharedPtr<FEditorEventListener> Listener;
 	static float ZoomMultiplier;
 	
 	virtual FName GetToolkitFName() const override;
@@ -19,5 +20,8 @@ public:
 
 private:
 	static void OnChangedZoomMultiplier(float Delta);
+	void OnKeyDown(SWidget* Widget, FKey Key, bool IsCtrlDown, bool IsAltDown, bool IsShiftDown);
+	
+	UQuestAssetInfo* Quests = nullptr;
 	
 };

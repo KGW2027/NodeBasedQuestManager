@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "PanelSlot.h"
 
+class UQuestInfo;
+
 class SQuestNodeGraphPanel : public SPanel
 {
 	SLATE_DECLARE_WIDGET_API(SQuestNodeGraphPanel, SPanel, NODEBASEDQUESTMANAGER_API)
@@ -19,10 +21,13 @@ class SQuestNodeGraphPanel : public SPanel
 	virtual bool SupportsKeyboardFocus() const override { return true; }
 
 	virtual FReply OnMouseWheel(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+	virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
 	
 private:
 	TPanelChildren<FPanelSlot> Children;
 	FVector2D RenderOffset;
+
+	void OnNewQuest(UQuestInfo* NewQuest);
 
 	static FSlateFontInfo GetLTFont(float Size);
 	

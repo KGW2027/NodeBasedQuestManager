@@ -27,4 +27,9 @@ void FPanelSlot::Construct(const FChildren& SlotOwner, FSlotArguments&& InArgs)
 	{
 		Position = InArgs._Position.Get();
 	}
+
+	if(InArgs.GetAttachedWidget() != nullptr)
+	{
+		AttachWidget(InArgs.GetAttachedWidget().ToSharedRef());
+	}
 }

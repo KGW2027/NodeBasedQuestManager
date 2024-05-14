@@ -2,6 +2,8 @@
 
 #include "Control/EditorEventListener.h"
 #include "Control/QuestAssetEditor.h"
+#include "Model/QuestInfo.h"
+#include "View/Leaf/QuestNode.h"
 
 #pragma region Initializer
 void SQuestNodeGraphPanel::PrivateRegisterAttributes(FSlateAttributeInitializer&)
@@ -15,6 +17,7 @@ SQuestNodeGraphPanel::SQuestNodeGraphPanel() : Children(this, GET_MEMBER_NAME_CH
 void SQuestNodeGraphPanel::Construct(const FArguments& InArgs)
 {
 	RenderOffset = FVector2D(0, 0);
+	FQuestAssetEditor::Listener->OnAddQuest.AddRaw(this, &SQuestNodeGraphPanel::OnNewQuest);
 }
 void SQuestNodeGraphPanel::ClearChildren()
 {
@@ -39,6 +42,7 @@ int32 SQuestNodeGraphPanel::OnPaint(const FPaintArgs& Args, const FGeometry& All
 	for(int32 Index = 0 ; Index < ArrangedChildren.Num() ; Index++)
 	{
 		FArrangedWidget& Widget = ArrangedChildren[Index];
+		// UE_LOG(LogTemp, Log, TEXT("%s Render on (%.0f, %.0f)"), *Widget.Widget->GetType().ToString(), Widget.Geometry.Position.X, Widget.Geometry.Position.Y);
 		Widget.Widget->Paint(ChildArgs, Widget.Geometry, MyCullingRect, OutDrawElements, ++LayerId, InWidgetStyle, bParentEnabled);
 	}
 
@@ -87,7 +91,7 @@ void SQuestNodeGraphPanel::OnArrangeChildren(const FGeometry& AllottedGeometry,
 		if(!Children[Index].IsRenderable(RenderOffset, AllottedGeometry.Size)) continue;
 		ArrangedChildren.AddWidget(EVisibility::Visible, AllottedGeometry.MakeChild(
 			Children[Index].GetWidget(),
-			Children[Index].GetPosition(),
+			Children[Index].GetPosition() - RenderOffset,
 			Children[Index].GetSize()
 		));
 	}
@@ -99,6 +103,21 @@ FReply SQuestNodeGraphPanel::OnMouseWheel(const FGeometry& MyGeometry, const FPo
 {
 	FQuestAssetEditor::Listener.Get()->OnZoomMultiplierChanged.Broadcast(MouseEvent.GetWheelDelta());
 	return FReply::Handled();
+}
+FReply SQuestNodeGraphPanel::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
+{
+	FQuestAssetEditor::Listener.Get()->OnKeyDown.Broadcast(this, InKeyEvent.GetKey(), InKeyEvent.IsControlDown(), InKeyEvent.IsAltDown(), InKeyEvent.IsShiftDown());
+	return FReply::Handled();
+}
+void SQuestNodeGraphPanel::OnNewQuest(UQuestInfo* NewQuest)
+{
+	FPanelSlot::FSlotArguments QuestChild = FPanelSlot::FSlotArguments(
+		TPanelChildren<FPanelSlot>::FScopedWidgetSlotArguments{
+			MakeUnique<FPanelSlot>(), Children, INDEX_NONE
+		}
+	);
+	QuestChild.AttachWidget(SNew(SQuestNode).Quest(NewQuest));
+	Children.AddSlot(MoveTemp(QuestChild));
 }
 #pragma endregion
 

@@ -6,12 +6,13 @@ UCLASS()
 class NODEBASEDQUESTMANAGER_API UQuestAssetInfo : public UObject
 {
 	GENERATED_BODY()
-	
 public:
 	UPROPERTY()
 	TArray<class UQuestInfo*> QuestInfos;
 
 	UPROPERTY()
 	FQuestAssetCache QuestCache;
-	
+
+	FName CreateNewUniqueId() const;
+	void Add(UQuestInfo* NewQuest);
 };
